@@ -1,0 +1,84 @@
+# SimpleJdbc
+一个自定义的简单的JDBC框架
+
+使用方法：
+共4步
+==================================================================================================
+1、创建properties配置文件config.properties，配置数据库参数：
+#数据库驱动（mysql8）
+driverClass=com.mysql.cj.jdbc.Driver
+jdbcUrl=jdbc:mysql://localhost:3306/data_source?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+username=root
+password=123456
+#扫描的包路径
+packages=testJdbc
+
+==================================================================================================
+2、创建java bean
+public class User {
+    private String name;
+    private String id;
+}
+
+==================================================================================================
+3、创建映射（UserTable.java,注意定义为接口）
+@Table(name = "t_user", beanClass = User.class)
+//属性名与java bean对应， 值为表字段名称，加上表名是考虑后续支持多表联查的情况。
+public interface UserTable {
+    String name = "t_user.t_name";
+    String id = "t_user.t_id";
+}
+
+==================================================================================================
+4、创建Statement（dao层）
+@Statement(table = UserTable.class)
+public interface UserStatement {
+    @Insert
+    boolean insert(User user);
+
+    @Delete
+    boolean delete(
+            @Expression(column = UserTable.id) String id
+    );
+
+    @Update
+    boolean update(
+            User user,
+            @Expression(column = UserTable.id) String id
+    );
+
+    @Select
+    User selectById(
+            @Expression(column = UserTable.id) String id
+    );
+
+    @Select
+    @Sort(column = UserTable.id)
+    List<User> selectByName(
+            @Expression(column = UserTable.name) String name,
+            @Limit int pageIndex,
+            @LimitSize int pageSize
+    );
+}
+
+==================================================================================================
+最后测试：
+public static void main(String[] args) {
+    	String basePath = System.getProperty("user.dir");
+        String configFile = basePath+"\\config.properties";
+        //初始化配置
+        Storage.init(configFile);
+        //插入
+        UserStatement userStatement = Storage.get(UserStatement.class);
+        for(int i = 0; i < 10; i++) {
+             userStatement.insert(new User("bbb",Integer.toString(i)));
+        }
+        //删除
+        userStatement.delete("2");
+        //修改
+        userStatement.update(new User("a",null), "5");
+        //查询（结果集支持List、Map、java bean、ResultSet）
+        User user = userStatement.selectById("5");
+        System.out.println(user.toString());
+    }
+==================================================================================================

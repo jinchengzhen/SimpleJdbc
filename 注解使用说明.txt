@@ -1,0 +1,28 @@
+注解使用说明：
+================================================================================================================================================
+    注解名称            作用域           参数名      参数类型     默认值           说明                       
+================================================================================================================================================
+    @Table              Class           name          String                    表名
+                                        beanClass     Class                     javabean类
+    @Statement          Class           handler       Class       DBHandler     动态代理类
+                                        table         Class                     绑定Table对象
+    @Insert             Method          column        String[]    {""}          指定字段，若为空表示全部字段
+                                        isMust        boolean     false
+    @Delete             Method                                                  定义删除方法
+    @Update             Method          column        String[]    {""}          指定字段，若为空表示全部字段
+                                        isMust        boolean     false
+    @Select             Method          contactTable  Class<?>[]  {Object.class} 关联表，默认值表示单表查询
+                                        column        String[]    {""}          指定字段，若为空表示全部字段
+                                        isMust        boolean     false
+    @Sort               Method          column        String[]                  指定排序字段
+                                        type          SortWay[]   SortWay.DESC  指定排序方式，默认降序
+    @Expression         Parameter       relation      Relation    Relation.AND  指定表达式之间的逻辑关系
+                                        column        String                    表达式中的字段名
+                                        option        Option      Option.EQUAL  算术表达式关系，默认为 '='
+                                        nonNull       boolean     false         当该参数值为null时是否加入查找条件，默认不查找               
+                                        value         String      ""            考虑表达式右侧为字段名的情况，当该值不为空时，方法参数传入的值无效
+    @Limit              Parameter       pageSize      int         -1            注解作用的参数表示pageIndex，pageSize可设为固定值
+    @LimitSize          Parameter                                               若有此注解，其作用的参数值将被设置到pageSize中
+    
+    
+    
